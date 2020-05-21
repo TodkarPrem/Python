@@ -1,0 +1,13 @@
+Language,Machine Learning,Deep Learning,NLP,Protocols
+Python,linear regression,Neural Networks,Natural Language Processing,I2C
+Django,logistic regression,keras,Named Entity Recognition,SPI
+Flask,K means clustering,face detection,NER,UART
+numpy,KNN,convolutional neural networks,tokenization,RS232
+scikitlearn,random forest,recurrent neural networks,POS tagging,CAN
+pandas,svm,cuda,Topic modelling,UDS
+matplotlib,,tensorflow,word modelling,
+scipy,,caffe,spacy,
+c,,opencv,chat bot,
+c++,,yolo,nltk,
+linux,,,sentiment analysis,
+,,,word embedding,
