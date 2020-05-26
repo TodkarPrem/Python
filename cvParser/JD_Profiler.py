@@ -2,6 +2,7 @@ import os
 import sys
 import spacy
 import textract
+import docx2txt
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import StringIO
@@ -18,28 +19,19 @@ def create_profile(file):
     text = text.lower()
     #print(text)
 
-    ## below is the csv where we have all the keywords, you can customize your own
+    ## below is the doc where we have a job description, you can customize your own
     try:
-        keyword_dict = pd.read_csv(sys.argv[2])
+        temp = docx2txt.process(sys.argv[2])
     except Exception as e:
         print("Exception1: ", e)
         exit()
 
-    NLP_words = [nlp(text.lower()) for text in keyword_dict['NLP'].dropna(axis = 0)]
-    ML_words = [nlp(text.lower()) for text in keyword_dict['Machine Learning'].dropna(axis = 0)]
-    DL_words = [nlp(text.lower()) for text in keyword_dict['Deep Learning'].dropna(axis = 0)]
-    python_words = [nlp(text.lower()) for text in keyword_dict['Language'].dropna(axis = 0)]
-    protocol_words = [nlp(text.lower()) for text in keyword_dict['Protocols'].dropna(axis = 0)]
-
-    #print(NLP_words, '\n', ML_words, "\n", DL_words, "\n", python_words, "\n", protocol_words)
+    JD_words = [line.replace('\t', ' ') for line in temp.split('\n') if line]
+    JD_words = [nlp(text.lower()) for text in JD_words]
 
     ## Creating object of matcher library to add skills that company wants
     matcher = PhraseMatcher(nlp.vocab)
-    matcher.add('NLP', None, *NLP_words)
-    matcher.add('ML', None, *ML_words)
-    matcher.add('DL', None, *DL_words)
-    matcher.add('Language', None, *python_words)
-    matcher.add('Protocols', None, *protocol_words)
+    matcher.add('Matched_Entities', None, *JD_words)
     doc = nlp(text)
 
     #print(type(doc), type(text))
@@ -47,7 +39,6 @@ def create_profile(file):
     ## Check the resume for skills which company wants
     d = []  
     matches = matcher(doc)
-    #print(matches, type(matches), type(matcher), type(doc))
     for match_id, start, end in matches:
         rule_id = nlp.vocab.strings[match_id]  # get the unicode ID, i.e. 'COLOR'
         span = doc[start : end]  # get the matched slice of the doc
@@ -134,4 +125,4 @@ if __name__ == '__main__' :
     if len(sys.argv) >= 3:
         main(sys.argv[1:])
     else:
-        print("Usage: python3 basic_cvParser.py Path_of_resumeFolder Path/csvFile.csv")
+        print("Usage: python3 basic_cvParser.py Path_of_resumeFolder Path/JobDescription.doc")
